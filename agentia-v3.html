@@ -1,0 +1,978 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#06060e">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="AgentIA">
+<title>AgentIA — L'IA des entrepreneurs</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;0,900;1,700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:      #06060e;
+  --bg2:     #0d0d1c;
+  --bg3:     #131325;
+  --bg4:     #1a1a30;
+  --bg5:     #20203a;
+  --v1:      #6c4ef2;
+  --v2:      #8b6fff;
+  --v3:      #b8a4ff;
+  --v4:      #e0d8ff;
+  --gold:    #f0b429;
+  --gold2:   #ffd166;
+  --gold3:   #fff0bc;
+  --biz:     #00d4aa;
+  --biz2:    #00f5c8;
+  --biz3:    #b3fff2;
+  --red:     #ff5e7d;
+  --green:   #3ddba0;
+  --text:    #ede8ff;
+  --text2:   #8880b0;
+  --text3:   #444068;
+  --bv:      rgba(108,78,242,.18);
+  --bg-gold: rgba(240,180,41,.12);
+  --bg-biz:  rgba(0,212,170,.1);
+  --r:       24px;
+  --rsm:     14px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;width:100%;background:var(--bg);color:var(--text);font-family:'Plus Jakarta Sans',sans-serif;overflow:hidden;position:fixed}
+
+/* ── ORBS ── */
+.orb{position:fixed;border-radius:50%;filter:blur(100px);pointer-events:none;z-index:0;animation:orbFloat 8s ease-in-out infinite}
+.o1{width:600px;height:600px;background:rgba(108,78,242,.09);top:-200px;right:-200px;animation-delay:0s}
+.o2{width:400px;height:400px;background:rgba(240,180,41,.06);bottom:-100px;left:-100px;animation-delay:3s}
+.o3{width:250px;height:250px;background:rgba(0,212,170,.05);top:35%;left:40%;animation-delay:5s}
+@keyframes orbFloat{0%,100%{transform:translate(0,0)}50%{transform:translate(10px,-15px)}}
+
+/* ── SCREENS ── */
+.screen{position:fixed;inset:0;z-index:10;display:flex;flex-direction:column;transition:opacity .4s cubic-bezier(.4,0,.2,1),transform .4s cubic-bezier(.4,0,.2,1)}
+.screen.hidden{opacity:0;pointer-events:none;transform:translateY(22px)}
+
+/* ══════════════════════════════
+   ONBOARDING
+══════════════════════════════ */
+#s-onboard{justify-content:space-between;overflow:hidden}
+
+.ob-top{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:56px 28px 24px;text-align:center;position:relative}
+
+.logo-ring{
+  position:relative;width:96px;height:96px;margin-bottom:28px;
+}
+.logo-ring::before{
+  content:'';position:absolute;inset:-3px;border-radius:28px;
+  background:linear-gradient(135deg,var(--gold),var(--v1),var(--biz));
+  animation:spin 4s linear infinite;
+}
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+.logo-inner{
+  position:absolute;inset:3px;border-radius:25px;
+  background:linear-gradient(135deg,var(--bg3),var(--bg2));
+  display:flex;align-items:center;justify-content:center;font-size:42px;
+}
+
+.logo-name{
+  font-family:'Playfair Display',serif;font-size:42px;font-weight:900;
+  letter-spacing:-2px;line-height:1;
+  background:linear-gradient(135deg,#fff 0%,var(--v3) 40%,var(--gold2) 80%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  margin-bottom:6px;
+}
+.logo-tag{
+  font-size:12px;letter-spacing:.15em;text-transform:uppercase;
+  color:var(--text2);margin-bottom:36px;
+}
+
+/* Hero stats */
+.hero-stats{display:flex;gap:24px;margin-bottom:32px}
+.stat{text-align:center}
+.stat-n{font-family:'Playfair Display',serif;font-size:22px;font-weight:800;color:var(--v3)}
+.stat-l{font-size:11px;color:var(--text2);margin-top:2px}
+
+/* Hero biz badge */
+.biz-hero-badge{
+  display:inline-flex;align-items:center;gap:8px;
+  background:linear-gradient(135deg,rgba(0,212,170,.12),rgba(108,78,242,.12));
+  border:1px solid rgba(0,212,170,.3);
+  border-radius:100px;padding:10px 18px;
+  font-size:13px;font-weight:600;color:var(--biz2);
+  margin-bottom:0;
+}
+
+.ob-bottom{padding:20px 24px 40px;display:flex;flex-direction:column;gap:10px}
+
+/* Scroll feature ticker */
+.ticker-wrap{overflow:hidden;padding:14px 0;border-top:1px solid var(--bv);border-bottom:1px solid var(--bv);flex-shrink:0}
+.ticker{display:flex;gap:32px;animation:ticker 18s linear infinite;white-space:nowrap}
+.ticker:hover{animation-play-state:paused}
+@keyframes ticker{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+.tick-item{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--text2);flex-shrink:0}
+.tick-item span{font-size:16px}
+
+/* ── BUTTONS ── */
+.btn{width:100%;border:none;border-radius:100px;padding:17px 24px;font-family:'Plus Jakarta Sans',sans-serif;font-size:15px;font-weight:700;cursor:pointer;transition:all .2s ease;position:relative;overflow:hidden;letter-spacing:.01em}
+.btn:active{transform:scale(.97)}
+.btn-v{background:linear-gradient(135deg,var(--v1),#4a2fd0);color:#fff;box-shadow:0 8px 40px rgba(108,78,242,.4)}
+.btn-v::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.18) 0%,transparent 60%)}
+.btn-gold{background:linear-gradient(135deg,var(--gold),#c08010);color:#0d0800;box-shadow:0 8px 40px rgba(240,180,41,.3)}
+.btn-gold::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.25) 0%,transparent 55%)}
+.btn-biz{background:linear-gradient(135deg,var(--biz),#009980);color:#001a14;box-shadow:0 8px 40px rgba(0,212,170,.3)}
+.btn-biz::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.2) 0%,transparent 55%)}
+.btn-ghost{background:var(--bg3);border:1px solid var(--bv);color:var(--text2)}
+.back-link{background:none;border:none;color:var(--text3);font-size:13px;cursor:pointer;text-decoration:underline;text-underline-offset:3px;padding:6px;text-align:center}
+
+/* ══════════════════════════════
+   API KEY
+══════════════════════════════ */
+#s-api{justify-content:center;align-items:center;padding:32px 24px;gap:0}
+.setup-emoji{font-size:52px;margin-bottom:22px}
+.setup-title{font-family:'Playfair Display',serif;font-size:28px;font-weight:800;text-align:center;margin-bottom:8px}
+.setup-sub{color:var(--text2);font-size:14px;text-align:center;line-height:1.7;margin-bottom:28px;max-width:320px}
+.inp-wrap{width:100%;position:relative;margin-bottom:10px}
+.inp-wrap input{width:100%;background:var(--bg3);border:1.5px solid var(--bv);border-radius:var(--rsm);padding:15px 48px 15px 16px;color:var(--text);font-size:14px;font-family:'Plus Jakarta Sans',sans-serif;outline:none;transition:border-color .2s}
+.inp-wrap input:focus{border-color:var(--v2)}
+.inp-wrap input::placeholder{color:var(--text3)}
+.eye{position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--text3);cursor:pointer;font-size:18px}
+.api-hint{background:rgba(108,78,242,.08);border:1px solid rgba(108,78,242,.2);border-radius:var(--rsm);padding:13px 15px;font-size:12px;color:var(--text2);line-height:1.7;margin-bottom:24px;width:100%}
+.api-hint a{color:var(--v3)}
+
+/* ══════════════════════════════
+   PLANS
+══════════════════════════════ */
+#s-plans{overflow-y:auto;padding:0;scrollbar-width:none}
+#s-plans::-webkit-scrollbar{display:none}
+
+.plans-hero{
+  padding:52px 22px 24px;
+  background:linear-gradient(to bottom,rgba(108,78,242,.08),transparent);
+  border-bottom:1px solid var(--bv);
+  flex-shrink:0;
+}
+.plans-title{font-family:'Playfair Display',serif;font-size:30px;font-weight:900;margin-bottom:6px}
+.plans-sub{color:var(--text2);font-size:14px;line-height:1.6}
+
+.plans-body{padding:20px 20px 40px;display:flex;flex-direction:column;gap:12px}
+
+/* Plan cards */
+.pc{border-radius:var(--r);padding:20px;border:1.5px solid var(--bv);background:var(--bg3);cursor:pointer;transition:all .25s;position:relative;overflow:hidden}
+.pc:active{transform:scale(.98)}
+.pc.sel{border-color:var(--v2);background:rgba(108,78,242,.1)}
+
+.pc.gold-card{border-color:rgba(240,180,41,.25);background:linear-gradient(135deg,rgba(240,180,41,.06),rgba(108,78,242,.06))}
+.pc.gold-card.sel{border-color:var(--gold);background:linear-gradient(135deg,rgba(240,180,41,.12),rgba(108,78,242,.1))}
+
+.pc.biz-card{
+  border-color:rgba(0,212,170,.3);
+  background:linear-gradient(135deg,rgba(0,212,170,.07),rgba(108,78,242,.07));
+  position:relative;
+}
+.pc.biz-card::before{
+  content:'';position:absolute;inset:0;border-radius:var(--r);
+  background:linear-gradient(135deg,rgba(0,212,170,.05),transparent 60%);
+  pointer-events:none;
+}
+.pc.biz-card.sel{border-color:var(--biz);background:linear-gradient(135deg,rgba(0,212,170,.14),rgba(108,78,242,.1))}
+
+.pc-badge{position:absolute;top:16px;right:16px;padding:4px 10px;border-radius:100px;font-size:11px;font-weight:800;letter-spacing:.03em}
+.pb-hot{background:rgba(108,78,242,.25);color:var(--v3)}
+.pb-gold{background:rgba(240,180,41,.2);color:var(--gold2)}
+.pb-biz{background:rgba(0,212,170,.2);color:var(--biz2);display:flex;align-items:center;gap:4px}
+
+.pc-top{display:flex;align-items:center;gap:13px;margin-bottom:16px}
+.pc-icon{font-size:30px;line-height:1}
+.pc-name{font-family:'Playfair Display',serif;font-size:19px;font-weight:800}
+.pc-price{font-size:13px;color:var(--text2);margin-top:3px}
+.pc-price strong{font-size:26px;color:var(--text);font-family:'Playfair Display',serif;font-weight:800}
+
+.pc-feats{display:flex;flex-direction:column;gap:7px}
+.pf{display:flex;align-items:flex-start;gap:8px;font-size:13px;color:var(--text2);line-height:1.4}
+.pf .ok{color:var(--green);flex-shrink:0;margin-top:1px}
+.pf .no{color:var(--text3);flex-shrink:0;margin-top:1px}
+.pf .bk{color:var(--biz);flex-shrink:0;margin-top:1px}
+
+/* Biz highlight strip */
+.biz-strip{
+  background:linear-gradient(135deg,rgba(0,212,170,.12),rgba(108,78,242,.12));
+  border:1px solid rgba(0,212,170,.25);
+  border-radius:var(--rsm);padding:12px 14px;margin-top:14px;
+  display:flex;align-items:center;gap:10px;
+}
+.biz-strip-icon{font-size:20px}
+.biz-strip-txt{font-size:12px;color:var(--biz3);line-height:1.5;font-weight:500}
+
+.plans-cta{padding:0 20px 40px;display:flex;flex-direction:column;gap:10px}
+.cta-note{text-align:center;font-size:11px;color:var(--text3);margin-top:4px}
+
+/* ══════════════════════════════
+   MAIN APP
+══════════════════════════════ */
+#s-app{background:var(--bg)}
+
+.app-hdr{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:52px 18px 14px;flex-shrink:0;
+  border-bottom:1px solid var(--bv);
+  background:linear-gradient(to bottom,rgba(6,6,14,.95),transparent);
+}
+.h-left{display:flex;align-items:center;gap:11px}
+.h-av{
+  width:40px;height:40px;border-radius:13px;
+  background:linear-gradient(135deg,var(--v1),#3a1fa8);
+  display:flex;align-items:center;justify-content:center;font-size:20px;
+  box-shadow:0 0 24px rgba(108,78,242,.4);flex-shrink:0;position:relative;
+}
+.h-av.biz-av{background:linear-gradient(135deg,var(--biz),#007a60)}
+.h-av.biz-av{box-shadow:0 0 24px rgba(0,212,170,.4)}
+.online-dot{position:absolute;width:10px;height:10px;border-radius:50%;background:var(--green);border:2px solid var(--bg);bottom:-2px;right:-2px}
+.h-name{font-family:'Playfair Display',serif;font-size:17px;font-weight:800}
+.h-badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;margin-top:3px;font-weight:600;padding:2px 8px;border-radius:100px}
+.hb-free{color:var(--text3)}
+.hb-pro{background:rgba(108,78,242,.2);color:var(--v3)}
+.hb-elite{background:rgba(240,180,41,.15);color:var(--gold2)}
+.hb-business{background:rgba(0,212,170,.15);color:var(--biz2)}
+.h-right{display:flex;gap:8px}
+.icon-btn{width:38px;height:38px;border-radius:12px;background:var(--bg3);border:1px solid var(--bv);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:17px;transition:all .2s}
+.icon-btn:active{transform:scale(.88)}
+
+/* Category tabs */
+.cat-bar{display:flex;gap:0;padding:0 16px;border-bottom:1px solid var(--bv);flex-shrink:0;overflow-x:auto;scrollbar-width:none}
+.cat-bar::-webkit-scrollbar{display:none}
+.cat-tab{padding:12px 14px;font-size:13px;font-weight:600;color:var(--text3);cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent;transition:all .2s;flex-shrink:0}
+.cat-tab.active{color:var(--v3);border-bottom-color:var(--v2)}
+.cat-tab.biz-tab.active{color:var(--biz2);border-bottom-color:var(--biz)}
+
+/* Skills grid */
+.skills-grid{display:flex;gap:8px;padding:12px 16px;overflow-x:auto;flex-shrink:0;scrollbar-width:none}
+.skills-grid::-webkit-scrollbar{display:none}
+.sk-chip{
+  display:flex;align-items:center;gap:6px;
+  background:var(--bg3);border:1px solid var(--bv);
+  border-radius:100px;padding:9px 15px;
+  white-space:nowrap;font-size:12px;font-weight:500;color:var(--text2);
+  cursor:pointer;transition:all .2s;flex-shrink:0;
+}
+.sk-chip:active{transform:scale(.95)}
+.sk-chip.active-v{border-color:var(--v2);color:var(--v3);background:rgba(108,78,242,.12)}
+.sk-chip.biz-chip{border-color:rgba(0,212,170,.25);color:var(--biz2);background:rgba(0,212,170,.07)}
+.sk-chip.biz-chip:active{border-color:var(--biz);background:rgba(0,212,170,.15)}
+.sk-chip.locked-chip{opacity:.4;cursor:default}
+.sk-chip .si{font-size:15px}
+.sk-chip .lk{font-size:11px;opacity:.7}
+
+/* Messages */
+.messages{flex:1;overflow-y:auto;padding:14px 16px;display:flex;flex-direction:column;gap:14px;scrollbar-width:none}
+.messages::-webkit-scrollbar{display:none}
+.msg{display:flex;gap:10px;animation:msgIn .3s cubic-bezier(.4,0,.2,1) both}
+@keyframes msgIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.msg.user{flex-direction:row-reverse}
+.m-av{width:32px;height:32px;border-radius:10px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:15px;margin-top:2px}
+.msg.agent .m-av{background:linear-gradient(135deg,var(--v1),#3a1fa8)}
+.msg.agent.biz-msg .m-av{background:linear-gradient(135deg,var(--biz),#007a60)}
+.msg.user .m-av{background:var(--bg3);border:1px solid var(--bv)}
+.m-bub{max-width:82%;padding:13px 16px;border-radius:20px;font-size:14px;line-height:1.65}
+.msg.agent .m-bub{background:var(--bg3);border:1px solid var(--bv);border-bottom-left-radius:4px;color:var(--text)}
+.msg.user .m-bub{background:linear-gradient(135deg,var(--v1),#4a2fd0);border-bottom-right-radius:4px;color:#fff}
+.m-bub strong{font-weight:700}
+.m-bub em{color:var(--text2);font-style:italic}
+.m-bub code{background:rgba(108,78,242,.15);padding:1px 6px;border-radius:5px;font-family:monospace;font-size:12px}
+.m-time{font-size:10px;color:var(--text3);margin-top:5px}
+.msg.user .m-time{text-align:right}
+
+/* Upgrade card in chat */
+.up-card{
+  background:linear-gradient(135deg,rgba(0,212,170,.08),rgba(108,78,242,.1));
+  border:1px solid rgba(0,212,170,.25);border-radius:var(--rsm);
+  padding:13px 15px;margin-top:8px;cursor:pointer;transition:all .2s;
+}
+.up-card:active{transform:scale(.98)}
+.up-card-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.up-card-title{font-size:13px;font-weight:700;color:var(--biz2)}
+.up-card-btn{background:var(--biz);color:#001a14;border:none;border-radius:100px;padding:6px 14px;font-size:12px;font-weight:700;cursor:pointer}
+.up-card-txt{font-size:12px;color:var(--text2);line-height:1.5}
+
+/* Typing */
+.typing{display:flex;gap:5px;align-items:center;padding:3px 2px}
+.typing span{width:7px;height:7px;border-radius:50%;background:var(--v2);animation:dot 1.3s infinite}
+.typing span:nth-child(2){animation-delay:.22s}
+.typing span:nth-child(3){animation-delay:.44s}
+@keyframes dot{0%,60%,100%{transform:translateY(0);opacity:.35}30%{transform:translateY(-7px);opacity:1}}
+
+/* Input */
+.input-bar{display:flex;align-items:flex-end;gap:10px;padding:12px 16px 32px;background:linear-gradient(to top,var(--bg) 55%,transparent);flex-shrink:0}
+.input-field{flex:1;background:var(--bg3);border:1.5px solid var(--bv);border-radius:22px;padding:13px 16px;color:var(--text);font-size:14px;font-family:'Plus Jakarta Sans',sans-serif;outline:none;resize:none;max-height:130px;overflow-y:auto;line-height:1.55;transition:border-color .2s;scrollbar-width:none}
+.input-field:focus{border-color:var(--v2)}
+.input-field::placeholder{color:var(--text3)}
+.input-field::-webkit-scrollbar{display:none}
+.send-btn{width:46px;height:46px;border-radius:14px;background:linear-gradient(135deg,var(--v1),#4a2fd0);border:none;display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;transition:all .2s;font-size:19px;box-shadow:0 4px 24px rgba(108,78,242,.4)}
+.send-btn:active{transform:scale(.88)}
+.send-btn:disabled{opacity:.35}
+
+/* ══════════════════════════════
+   SETTINGS
+══════════════════════════════ */
+#s-settings{overflow-y:auto;padding:52px 20px 40px;scrollbar-width:none}
+#s-settings::-webkit-scrollbar{display:none}
+.stg-hdr{display:flex;align-items:center;gap:12px;margin-bottom:28px}
+.back-btn{width:38px;height:38px;border-radius:12px;background:var(--bg3);border:1px solid var(--bv);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px;flex-shrink:0}
+.stg-title{font-family:'Playfair Display',serif;font-size:22px;font-weight:800}
+.stg-sec{margin-bottom:22px}
+.stg-lbl{font-size:11px;color:var(--text3);letter-spacing:.12em;text-transform:uppercase;margin-bottom:10px;padding-left:2px}
+.stg-row{display:flex;align-items:center;justify-content:space-between;background:var(--bg3);border:1px solid var(--bv);border-radius:var(--rsm);padding:14px 16px;margin-bottom:8px;cursor:pointer;transition:all .2s}
+.stg-row:active{transform:scale(.98)}
+.stg-left{display:flex;align-items:center;gap:12px}
+.stg-ico{font-size:19px}
+.stg-txt{font-size:14px;font-weight:500}
+.stg-sub{font-size:11px;color:var(--text3);margin-top:2px}
+.stg-right{font-size:13px;color:var(--text2)}
+.bdg{display:inline-block;padding:3px 10px;border-radius:100px;font-size:11px;font-weight:700}
+.b-green{background:rgba(61,219,160,.15);color:var(--green)}
+.b-v{background:rgba(108,78,242,.2);color:var(--v3)}
+.b-gold{background:rgba(240,180,41,.15);color:var(--gold2)}
+.b-biz{background:rgba(0,212,170,.15);color:var(--biz2)}
+.b-off{background:rgba(68,64,104,.3);color:var(--text3)}
+
+/* Plan banner */
+.plan-banner{border-radius:var(--r);padding:18px 18px;margin-bottom:22px;display:flex;align-items:center;gap:14px}
+.pb-free{background:var(--bg3);border:1px solid var(--bv)}
+.pb-pro{background:linear-gradient(135deg,rgba(108,78,242,.14),rgba(74,47,208,.08));border:1px solid rgba(108,78,242,.3)}
+.pb-elite{background:linear-gradient(135deg,rgba(240,180,41,.1),rgba(108,78,242,.1));border:1px solid rgba(240,180,41,.25)}
+.pb-business{background:linear-gradient(135deg,rgba(0,212,170,.1),rgba(108,78,242,.1));border:1px solid rgba(0,212,170,.3)}
+.pb-icon{font-size:34px}
+.pb-name{font-family:'Playfair Display',serif;font-size:17px;font-weight:800}
+.pb-desc{font-size:12px;color:var(--text2);margin-top:3px}
+.pb-btn{margin-left:auto;padding:9px 16px;border-radius:100px;font-size:12px;font-weight:700;border:none;cursor:pointer;white-space:nowrap}
+.pb-up{background:var(--biz);color:#001a14}
+.pb-mg{background:var(--bg4);color:var(--text2);border:1px solid var(--bv)}
+
+/* ── MODAL ── */
+.modal{position:fixed;inset:0;z-index:100;background:rgba(6,6,14,.88);backdrop-filter:blur(10px);display:flex;align-items:flex-end;transition:opacity .3s}
+.modal.hidden{opacity:0;pointer-events:none}
+.modal-sheet{width:100%;background:var(--bg2);border-top:1px solid var(--bv);border-radius:30px 30px 0 0;padding:18px 20px 40px;max-height:92vh;overflow-y:auto;scrollbar-width:none;transform:translateY(0);transition:transform .35s cubic-bezier(.4,0,.2,1)}
+.modal-sheet::-webkit-scrollbar{display:none}
+.modal.hidden .modal-sheet{transform:translateY(100%)}
+.modal-handle{width:40px;height:4px;background:var(--bg5);border-radius:2px;margin:0 auto 22px}
+.modal-title{font-family:'Playfair Display',serif;font-size:24px;font-weight:900;text-align:center;margin-bottom:6px}
+.modal-sub{font-size:13px;color:var(--text2);text-align:center;margin-bottom:22px;line-height:1.6}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:88px;left:50%;transform:translateX(-50%) translateY(16px);background:var(--bg3);border:1px solid var(--bv);border-radius:100px;padding:11px 22px;font-size:13px;color:var(--text2);opacity:0;transition:all .3s;z-index:999;white-space:nowrap;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+</style>
+</head>
+<body>
+<div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div>
+
+<!-- ══ ONBOARDING ══ -->
+<div class="screen" id="s-onboard">
+  <div class="ob-top">
+    <div class="logo-ring"><div class="logo-inner">🤖</div></div>
+    <div class="logo-name">AgentIA</div>
+    <div class="logo-tag">L'IA des entrepreneurs &amp; du quotidien</div>
+    <div class="hero-stats">
+      <div class="stat"><div class="stat-n">24+</div><div class="stat-l">Compétences</div></div>
+      <div class="stat"><div class="stat-n">4</div><div class="stat-l">Plans</div></div>
+      <div class="stat"><div class="stat-n">∞</div><div class="stat-l">Possibilités</div></div>
+    </div>
+    <div class="biz-hero-badge">🚀 Mode Business — Crypto · SaaS · Drop · Ads · Branding</div>
+  </div>
+
+  <!-- Ticker -->
+  <div class="ticker-wrap">
+    <div class="ticker">
+      <div class="tick-item"><span>💹</span>Analyse crypto</div>
+      <div class="tick-item"><span>📦</span>Produits dropshipping</div>
+      <div class="tick-item"><span>🎯</span>Facebook Ads</div>
+      <div class="tick-item"><span>✉️</span>Emails</div>
+      <div class="tick-item"><span>📈</span>Business plan</div>
+      <div class="tick-item"><span>🤝</span>Prospection B2B</div>
+      <div class="tick-item"><span>📱</span>Réseaux sociaux</div>
+      <div class="tick-item"><span>⚡</span>SaaS go-to-market</div>
+      <div class="tick-item"><span>🧘</span>Bien-être</div>
+      <div class="tick-item"><span>✍️</span>Copywriting</div>
+      <!-- duplicate for infinite -->
+      <div class="tick-item"><span>💹</span>Analyse crypto</div>
+      <div class="tick-item"><span>📦</span>Produits dropshipping</div>
+      <div class="tick-item"><span>🎯</span>Facebook Ads</div>
+      <div class="tick-item"><span>✉️</span>Emails</div>
+      <div class="tick-item"><span>📈</span>Business plan</div>
+      <div class="tick-item"><span>🤝</span>Prospection B2B</div>
+      <div class="tick-item"><span>📱</span>Réseaux sociaux</div>
+      <div class="tick-item"><span>⚡</span>SaaS go-to-market</div>
+    </div>
+  </div>
+
+  <div class="ob-bottom">
+    <button class="btn btn-biz" onclick="goTo('s-api')">🚀 Commencer maintenant — C'est gratuit</button>
+    <button class="btn btn-ghost" onclick="showToast('Connexion bientôt disponible !')">J'ai déjà un compte</button>
+  </div>
+</div>
+
+<!-- ══ API KEY ══ -->
+<div class="screen hidden" id="s-api">
+  <div class="setup-emoji">🔑</div>
+  <div class="setup-title">Connecte ton IA</div>
+  <div class="setup-sub">AgentIA utilise Claude d'Anthropic comme cerveau. Entre ta clé API gratuite pour démarrer.</div>
+  <div class="inp-wrap" style="padding:0 24px;width:100%">
+    <input type="password" id="api-inp" placeholder="sk-ant-api03-..." />
+    <button class="eye" onclick="toggleEye()">👁</button>
+  </div>
+  <div class="api-hint" style="margin:10px 24px 24px;width:calc(100% - 48px)">
+    💡 Clé gratuite sur <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a> → API Keys → Create Key. Les premiers tokens sont offerts !
+  </div>
+  <div style="padding:0 24px;width:100%;display:flex;flex-direction:column;gap:10px">
+    <button class="btn btn-v" onclick="saveKey()">Continuer →</button>
+    <button class="back-link" onclick="goTo('s-onboard')">← Retour</button>
+  </div>
+</div>
+
+<!-- ══ PLANS ══ -->
+<div class="screen hidden" id="s-plans">
+  <div class="plans-hero">
+    <div class="plans-title">Choisis ton plan</div>
+    <div class="plans-sub">Commence gratuitement. Upgrade quand tu veux, annule à tout moment.</div>
+  </div>
+  <div class="plans-body">
+
+    <!-- FREE -->
+    <div class="pc sel" id="pc-free" onclick="selPlan('free')">
+      <div class="pc-top">
+        <div class="pc-icon">🌱</div>
+        <div><div class="pc-name">Gratuit</div><div class="pc-price"><strong>0€</strong>/mois</div></div>
+      </div>
+      <div class="pc-feats">
+        <div class="pf"><span class="ok">✓</span>20 messages / jour</div>
+        <div class="pf"><span class="ok">✓</span>4 compétences (email, résumé, traduction, réponse)</div>
+        <div class="pf"><span class="no">✗</span>Compétences avancées</div>
+        <div class="pf"><span class="no">✗</span>Mode Business</div>
+      </div>
+    </div>
+
+    <!-- PRO -->
+    <div class="pc" id="pc-pro" onclick="selPlan('pro')">
+      <span class="pc-badge pb-hot">🔥 Populaire</span>
+      <div class="pc-top">
+        <div class="pc-icon">⚡</div>
+        <div><div class="pc-name">Pro</div><div class="pc-price"><strong>9€</strong>/mois</div></div>
+      </div>
+      <div class="pc-feats">
+        <div class="pf"><span class="ok">✓</span>Messages illimités</div>
+        <div class="pf"><span class="ok">✓</span>12 compétences quotidiennes</div>
+        <div class="pf"><span class="ok">✓</span>Mémoire personnalisée</div>
+        <div class="pf"><span class="ok">✓</span>Réseaux sociaux, voyages, discours</div>
+        <div class="pf"><span class="no">✗</span>Mode Business (crypto, drop, SaaS...)</div>
+      </div>
+    </div>
+
+    <!-- ELITE -->
+    <div class="pc gold-card" id="pc-elite" onclick="selPlan('elite')">
+      <span class="pc-badge pb-gold">👑 Premium</span>
+      <div class="pc-top">
+        <div class="pc-icon">💎</div>
+        <div><div class="pc-name">Élite</div><div class="pc-price"><strong>24€</strong>/mois</div></div>
+      </div>
+      <div class="pc-feats">
+        <div class="pf"><span class="ok">✓</span>Tout le plan Pro</div>
+        <div class="pf"><span class="ok">✓</span>Agent évolutif (apprend tes habitudes)</div>
+        <div class="pf"><span class="ok">✓</span>Coach bien-être & motivation</div>
+        <div class="pf"><span class="ok">✓</span>Réponses ultra-prioritaires</div>
+        <div class="pf"><span class="no">✗</span>Mode Business complet</div>
+      </div>
+    </div>
+
+    <!-- BUSINESS -->
+    <div class="pc biz-card" id="pc-business" onclick="selPlan('business')">
+      <span class="pc-badge pb-biz">🚀 Business</span>
+      <div class="pc-top">
+        <div class="pc-icon">💼</div>
+        <div><div class="pc-name">Business</div><div class="pc-price"><strong>39€</strong>/mois</div></div>
+      </div>
+      <div class="pc-feats">
+        <div class="pf"><span class="ok">✓</span>Tout le plan Élite inclus</div>
+        <div class="pf"><span class="bk">◆</span>Crypto & trading (analyses, stratégies)</div>
+        <div class="pf"><span class="bk">◆</span>Dropshipping (produits gagnants, fournisseurs)</div>
+        <div class="pf"><span class="bk">◆</span>SaaS (idées, pricing, go-to-market)</div>
+        <div class="pf"><span class="bk">◆</span>Pub & copywriting (Facebook Ads, Google Ads)</div>
+        <div class="pf"><span class="bk">◆</span>Prospection B2B, legal, compta simplifiée</div>
+        <div class="pf"><span class="bk">◆</span>Personal branding & e-commerce</div>
+      </div>
+      <div class="biz-strip">
+        <div class="biz-strip-icon">🧠</div>
+        <div class="biz-strip-txt">L'IA à avoir quand tu fais du business. Elle connaît tous les terrains.</div>
+      </div>
+    </div>
+
+  </div>
+  <div class="plans-cta">
+    <button class="btn btn-v" id="plan-cta-btn" onclick="confirmPlan()">Commencer gratuitement →</button>
+    <div class="cta-note">Aucune CB requise pour le plan gratuit · Sans engagement</div>
+    <button class="back-link" onclick="goTo('s-api')">← Retour</button>
+  </div>
+</div>
+
+<!-- ══ APP ══ -->
+<div class="screen hidden" id="s-app">
+  <div class="app-hdr">
+    <div class="h-left">
+      <div class="h-av" id="h-av">🤖<div class="online-dot"></div></div>
+      <div>
+        <div class="h-name">AgentIA</div>
+        <div class="h-badge" id="h-badge">Plan Gratuit</div>
+      </div>
+    </div>
+    <div class="h-right">
+      <div class="icon-btn" onclick="openUpgradeModal()" title="Upgrade">⚡</div>
+      <div class="icon-btn" onclick="goTo('s-settings')" title="Paramètres">⚙️</div>
+    </div>
+  </div>
+
+  <!-- Category tabs -->
+  <div class="cat-bar" id="cat-bar"></div>
+
+  <!-- Skills chips -->
+  <div class="skills-grid" id="skills-grid"></div>
+
+  <div class="messages" id="messages"></div>
+
+  <div class="input-bar">
+    <textarea class="input-field" id="msg-inp" placeholder="Délègue une tâche à ton agent..." rows="1"
+      onkeydown="handleKey(event)" oninput="autoResize(this)"></textarea>
+    <button class="send-btn" id="send-btn" onclick="sendMsg()">➤</button>
+  </div>
+</div>
+
+<!-- ══ SETTINGS ══ -->
+<div class="screen hidden" id="s-settings">
+  <div class="stg-hdr">
+    <div class="back-btn" onclick="goTo('s-app')">←</div>
+    <div class="stg-title">Paramètres</div>
+  </div>
+  <div id="plan-banner-wrap"></div>
+  <div class="stg-sec">
+    <div class="stg-lbl">Agent</div>
+    <div class="stg-row"><div class="stg-left"><span class="stg-ico">🤖</span><div><div class="stg-txt">Modèle IA</div><div class="stg-sub">Claude Sonnet 4</div></div></div><span class="bdg b-green">Actif</span></div>
+    <div class="stg-row" onclick="goTo('s-api')"><div class="stg-left"><span class="stg-ico">🔑</span><div><div class="stg-txt">Clé API</div><div class="stg-sub" id="key-preview">sk-ant-...****</div></div></div><div class="stg-right">Modifier →</div></div>
+  </div>
+  <div class="stg-sec">
+    <div class="stg-lbl">Compétences</div>
+    <div id="skills-stg-list"></div>
+  </div>
+  <div class="stg-sec">
+    <div class="stg-lbl">Compte</div>
+    <div class="stg-row" onclick="showToast('Profil bientôt disponible !')"><div class="stg-left"><span class="stg-ico">👤</span><div class="stg-txt">Mon profil</div></div><div class="stg-right">→</div></div>
+    <div class="stg-row" onclick="clearAll()"><div class="stg-left"><span class="stg-ico">🗑️</span><div class="stg-txt" style="color:var(--red)">Réinitialiser l'app</div></div><div class="stg-right">→</div></div>
+  </div>
+</div>
+
+<!-- ══ UPGRADE MODAL ══ -->
+<div class="modal hidden" id="upgrade-modal" onclick="closeModalOut(event,'upgrade-modal')">
+  <div class="modal-sheet">
+    <div class="modal-handle"></div>
+    <div class="modal-title">🚀 Passe la vitesse supérieure</div>
+    <div class="modal-sub">Débloque le mode Business et toutes les compétences pour entrepreneurs.</div>
+
+    <div class="pc biz-card" id="m-biz" onclick="selModalPlan('business')" style="margin-bottom:10px">
+      <span class="pc-badge pb-biz">🚀 Recommandé</span>
+      <div class="pc-top"><div class="pc-icon">💼</div><div><div class="pc-name">Business — 39€/mois</div><div class="pc-price" style="font-size:12px;margin-top:4px">Crypto · Drop · SaaS · Ads · B2B · Legal · Compta</div></div></div>
+    </div>
+    <div class="pc gold-card" id="m-elite" onclick="selModalPlan('elite')" style="margin-bottom:10px">
+      <span class="pc-badge pb-gold">👑 Premium</span>
+      <div class="pc-top"><div class="pc-icon">💎</div><div><div class="pc-name">Élite — 24€/mois</div><div class="pc-price" style="font-size:12px;margin-top:4px">12 compétences · Agent évolutif · Coach bien-être</div></div></div>
+    </div>
+    <div class="pc" id="m-pro" onclick="selModalPlan('pro')" style="margin-bottom:20px">
+      <div class="pc-top"><div class="pc-icon">⚡</div><div><div class="pc-name">Pro — 9€/mois</div><div class="pc-price" style="font-size:12px;margin-top:4px">Messages illimités · 12 compétences quotidiennes</div></div></div>
+    </div>
+
+    <button class="btn btn-biz" onclick="doUpgrade()">Upgrader maintenant →</button>
+    <button class="btn btn-ghost" style="margin-top:10px" onclick="closeModal('upgrade-modal')">Rester en gratuit</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ─── SKILLS DATA ───
+const SKILLS = {
+  perso: [
+    {id:'email',    icon:'✉️', label:'Emails',          plan:'free',     prompt:'Rédige un email professionnel pour : '},
+    {id:'resume',   icon:'📄', label:'Résumer',          plan:'free',     prompt:'Résume ce texte clairement : '},
+    {id:'translate',icon:'🌍', label:'Traduction',       plan:'free',     prompt:'Traduis ce texte en anglais : '},
+    {id:'reply',    icon:'💬', label:'Répondre',         plan:'free',     prompt:'Réponds à ce message à ma place : '},
+    {id:'ideas',    icon:'💡', label:'Brainstorm',       plan:'pro',      prompt:'Génère 5 idées créatives sur : '},
+    {id:'social',   icon:'📱', label:'Réseaux sociaux',  plan:'pro',      prompt:'Crée une publication Instagram percutante sur : '},
+    {id:'travel',   icon:'✈️', label:'Voyage',           plan:'pro',      prompt:'Planifie un voyage de 5 jours à : '},
+    {id:'speech',   icon:'🎤', label:'Discours',         plan:'pro',      prompt:'Rédige un discours convaincant sur : '},
+    {id:'negociate',icon:'🤝', label:'Négociation',      plan:'pro',      prompt:'Aide-moi à négocier : '},
+    {id:'deals',    icon:'🛍️', label:'Meilleures offres',plan:'pro',      prompt:'Aide-moi à trouver la meilleure offre pour : '},
+    {id:'coach',    icon:'🧘', label:'Coach bien-être',  plan:'elite',    prompt:'Donne-moi des conseils pour améliorer : '},
+    {id:'grow',     icon:'🌀', label:'Agent évolutif',   plan:'elite',    prompt:'Analyse mes habitudes et aide-moi à progresser sur : '},
+  ],
+  business: [
+    {id:'crypto',   icon:'💹', label:'Crypto & Trading', plan:'business', prompt:'Analyse cette crypto/situation de marché et donne-moi une stratégie : '},
+    {id:'drop',     icon:'📦', label:'Dropshipping',     plan:'business', prompt:'Aide-moi à trouver des produits gagnants pour le dropshipping dans ce niche : '},
+    {id:'saas',     icon:'⚡', label:'SaaS',             plan:'business', prompt:'Aide-moi sur mon projet SaaS : '},
+    {id:'ads',      icon:'🎯', label:'Pub & Copywriting', plan:'business', prompt:'Crée une publicité Facebook/Google Ads percutante pour : '},
+    {id:'ecom',     icon:'🛒', label:'E-commerce',       plan:'business', prompt:'Aide-moi à optimiser mon e-commerce : fiche produit, emails, conversion pour : '},
+    {id:'bizplan',  icon:'📈', label:'Business Plan',    plan:'business', prompt:'Aide-moi à construire mon business plan pour : '},
+    {id:'compta',   icon:'🧾', label:'Compta & Fiscalité',plan:'business', prompt:'Explique-moi simplement cette notion de comptabilité/fiscalité française : '},
+    {id:'automate', icon:'🤖', label:'Automatisation',   plan:'business', prompt:'Aide-moi à automatiser ce processus ou workflow : '},
+    {id:'brand',    icon:'✨', label:'Personal Branding', plan:'business', prompt:'Aide-moi à développer mon personal branding sur : '},
+    {id:'b2b',      icon:'🏢', label:'Prospection B2B',  plan:'business', prompt:'Rédige un message de prospection B2B percutant pour : '},
+    {id:'smm',      icon:'📊', label:'Growth Hacking',   plan:'business', prompt:'Donne-moi une stratégie de growth hacking pour : '},
+    {id:'legal',    icon:'⚖️', label:'Legal & Contrats', plan:'business', prompt:'Explique-moi simplement ce point légal ou aide-moi à rédiger : '},
+  ]
+};
+
+const FREE_SKILLS   = ['email','resume','translate','reply'];
+const PRO_SKILLS    = [...FREE_SKILLS,'ideas','social','travel','speech','negociate','deals'];
+const ELITE_SKILLS  = [...PRO_SKILLS,'coach','grow'];
+const BIZ_SKILLS    = [...ELITE_SKILLS,...SKILLS.business.map(s=>s.id)];
+
+const PLAN_UNLOCKED = { free:FREE_SKILLS, pro:PRO_SKILLS, elite:ELITE_SKILLS, business:BIZ_SKILLS };
+
+const PLAN_META = {
+  free:     {label:'Plan Gratuit',  icon:'🌱', badgeCls:'',        avCls:'',       bannerCls:'pb-free'},
+  pro:      {label:'Plan Pro ⚡',   icon:'⚡', badgeCls:'b-v',     avCls:'',       bannerCls:'pb-pro'},
+  elite:    {label:'Plan Élite 👑', icon:'💎', badgeCls:'b-gold',  avCls:'',       bannerCls:'pb-elite'},
+  business: {label:'Business 🚀',  icon:'💼', badgeCls:'b-biz',   avCls:'biz-av', bannerCls:'pb-business'},
+};
+
+const SYSTEM = `Tu es AgentIA, un agent IA ultra-compétent qui parle français.
+
+Tu maîtrises deux domaines :
+
+═══ VIE QUOTIDIENNE ═══
+✉️ Emails & messages — Rédiger, améliorer, répondre
+📄 Résumés — Condenser tout type de texte
+🌍 Traduction — Toutes langues
+💬 Réponses — Répondre à des messages à la place de l'utilisateur
+💡 Brainstorm — Générer des idées créatives
+📱 Réseaux sociaux — Posts engageants, captions, stratégie
+✈️ Voyages — Itinéraires, conseils, réservations
+🎤 Discours & présentations — Convaincre, captiver
+🤝 Négociation — Loyer, salaire, contrats
+🛍️ Meilleures offres — Comparer, recommander
+🧘 Coaching bien-être — Motivation, habitudes, mindset
+🌀 Agent évolutif — Apprendre des habitudes de l'utilisateur
+
+═══ BUSINESS & ENTREPRENEURIAT ═══
+💹 Crypto & Trading — Analyser des marchés, stratégies, gestion du risque, DCA, altcoins, NFT
+📦 Dropshipping — Trouver des produits gagnants, fournisseurs AliExpress/CJ, niches tendance
+⚡ SaaS — Idées validées, pricing strategy, go-to-market, churn reduction, growth loops
+🎯 Publicité & Copywriting — Facebook Ads, Google Ads, hooks, VSL, landing pages qui convertissent
+🛒 E-commerce — Fiches produit optimisées, séquences emails Klaviyo, abandon panier, upsell
+📈 Business Plan — Pitch deck, analyse SWOT, projections financières, executive summary
+🧾 Comptabilité & Fiscalité — TVA, charges sociales, statuts juridiques, optimisation fiscale française
+🤖 Automatisation — Make, Zapier, n8n, workflows, no-code, productivité maximale
+✨ Personal Branding — LinkedIn, Twitter/X, newsletter, positionnement d'expert
+🏢 Prospection B2B — Cold emails, LinkedIn outreach, scripts d'appel, CRM
+📊 Growth Hacking — Acquisition organique, viral loops, SEO, communauté, referral
+⚖️ Legal & Contrats — CGV, mentions légales, contrats freelance, RGPD, statuts
+
+Règles :
+- Sois direct, efficace, sans blabla
+- Quand tu produis du contenu prêt à utiliser, formate-le clairement
+- En mode business, utilise un vocabulaire précis et professionnel
+- Utilise des émojis avec parcimonie
+- Si la demande est vague, pose une question courte et précise
+- Tu t'améliores à chaque échange`;
+
+// ─── STATE ───
+let apiKey = localStorage.getItem('agentia_key')||'';
+let plan   = localStorage.getItem('agentia_plan')||'free';
+let msgs   = JSON.parse(localStorage.getItem('agentia_msgs')||'[]');
+let count  = parseInt(localStorage.getItem('agentia_count')||'0');
+let cat    = 'perso';
+let selModalPlanVal = 'business';
+let selPlanVal = 'free';
+let isTyping = false;
+
+// ─── BOOT ───
+window.addEventListener('load',()=>{
+  if(apiKey){ initApp(); goTo('s-app'); }
+  else goTo('s-onboard');
+});
+
+function initApp(){
+  renderHeader();
+  renderCats();
+  renderSkillsGrid();
+  renderSkillsStg();
+  renderPlanBanner();
+  updateKeyPreview();
+  if(msgs.length===0) addWelcome();
+  renderMsgs();
+}
+
+// ─── NAV ───
+function goTo(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.add('hidden'));
+  document.getElementById(id).classList.remove('hidden');
+}
+function toggleEye(){ const i=document.getElementById('api-inp'); i.type=i.type==='password'?'text':'password'; }
+
+function saveKey(){
+  const v=document.getElementById('api-inp').value.trim();
+  if(!v.startsWith('sk-')){ showToast('❌ Clé invalide — doit commencer par sk-ant-'); return; }
+  apiKey=v; localStorage.setItem('agentia_key',apiKey);
+  goTo('s-plans');
+}
+
+// ─── PLANS ───
+function selPlan(p){
+  selPlanVal=p;
+  ['free','pro','elite','business'].forEach(x=>{ const el=document.getElementById('pc-'+x); if(el) el.classList.remove('sel'); });
+  document.getElementById('pc-'+p)?.classList.add('sel');
+  const labels={free:'Commencer gratuitement →',pro:'Choisir Pro — 9€/mois →',elite:'Choisir Élite — 24€/mois →',business:'Choisir Business — 39€/mois 🚀'};
+  const btn=document.getElementById('plan-cta-btn');
+  if(btn) btn.textContent=labels[p];
+  if(p==='business') btn.className='btn btn-biz';
+  else if(p==='elite') btn.className='btn btn-gold';
+  else btn.className='btn btn-v';
+}
+
+function confirmPlan(){
+  plan=selPlanVal;
+  localStorage.setItem('agentia_plan',plan);
+  initApp(); goTo('s-app');
+  const t={free:'🌱 Plan Gratuit activé !',pro:'⚡ Plan Pro activé !',elite:'👑 Plan Élite activé !',business:'🚀 Mode Business activé !'};
+  setTimeout(()=>showToast(t[plan]),350);
+}
+
+// ─── HEADER ───
+function renderHeader(){
+  const m=PLAN_META[plan];
+  const av=document.getElementById('h-av');
+  const bdg=document.getElementById('h-badge');
+  if(av){ av.className='h-av '+(m.avCls||''); av.innerHTML=m.icon+'<div class="online-dot"></div>'; }
+  if(bdg){
+    bdg.textContent=m.label;
+    bdg.className='h-badge '+(plan==='free'?'hb-free':plan==='pro'?'hb-pro':plan==='elite'?'hb-elite':'hb-business');
+  }
+}
+
+// ─── CATEGORIES ───
+function renderCats(){
+  const bar=document.getElementById('cat-bar');
+  if(!bar) return;
+  bar.innerHTML='';
+  const tabs=[{id:'perso',label:'🏠 Quotidien'},{id:'business',label:'💼 Business'}];
+  tabs.forEach(t=>{
+    const div=document.createElement('div');
+    div.className='cat-tab'+(t.id==='business'?' biz-tab':'')+(cat===t.id?' active':'');
+    div.textContent=t.label;
+    div.onclick=()=>{ cat=t.id; renderCats(); renderSkillsGrid(); };
+    bar.appendChild(div);
+  });
+}
+
+// ─── SKILLS GRID ───
+function isUnlocked(sk){ return PLAN_UNLOCKED[plan]?.includes(sk.id); }
+
+function renderSkillsGrid(){
+  const g=document.getElementById('skills-grid');
+  if(!g) return;
+  g.innerHTML='';
+  const list=SKILLS[cat]||[];
+  list.forEach(sk=>{
+    const ul=isUnlocked(sk);
+    const chip=document.createElement('div');
+    const isBiz=sk.plan==='business';
+    chip.className='sk-chip'+(isBiz&&ul?' biz-chip':'')+(ul?'':' locked-chip');
+    chip.innerHTML=`<span class="si">${sk.icon}</span>${sk.label}${ul?'':'<span class="lk">🔒</span>'}`;
+    chip.onclick=()=>{ if(ul) quickSkill(sk); else openUpgradeModal(); };
+    g.appendChild(chip);
+  });
+}
+
+function quickSkill(sk){
+  const inp=document.getElementById('msg-inp');
+  inp.value=sk.prompt; inp.focus(); autoResize(inp);
+}
+
+// ─── SKILLS SETTINGS ───
+function renderSkillsStg(){
+  const el=document.getElementById('skills-stg-list');
+  if(!el) return;
+  el.innerHTML='';
+  ['perso','business'].forEach(cat=>{
+    const hdr=document.createElement('div');
+    hdr.style.cssText='font-size:12px;color:var(--text3);margin:10px 0 8px;font-weight:600;text-transform:uppercase;letter-spacing:.08em';
+    hdr.textContent=cat==='perso'?'🏠 Quotidien':'💼 Business';
+    el.appendChild(hdr);
+    SKILLS[cat].forEach(sk=>{
+      const ul=isUnlocked(sk);
+      const planLbl={free:'Gratuit',pro:'Pro',elite:'Élite',business:'Business'}[sk.plan];
+      const bdgCls={free:'b-green',pro:'b-v',elite:'b-gold',business:'b-biz'}[sk.plan];
+      const row=document.createElement('div');
+      row.className='stg-row';
+      row.innerHTML=`<div class="stg-left"><span class="stg-ico">${sk.icon}</span><div class="stg-txt">${sk.label}</div></div><span class="bdg ${ul?bdgCls:'b-off'}">${ul?'✓ '+planLbl:'🔒 '+planLbl}</span>`;
+      el.appendChild(row);
+    });
+  });
+}
+
+// ─── PLAN BANNER ───
+function renderPlanBanner(){
+  const w=document.getElementById('plan-banner-wrap');
+  if(!w) return;
+  const info={
+    free:    {cls:'pb-free',    icon:'🌱',label:'Plan Gratuit',    desc:'20 msg/jour · 4 compétences',             up:true},
+    pro:     {cls:'pb-pro',     icon:'⚡',label:'Plan Pro',        desc:'Illimité · 12 compétences quotidiennes',   up:true},
+    elite:   {cls:'pb-elite',   icon:'💎',label:'Plan Élite',      desc:'Illimité · 20 compétences · Évolutif',     up:true},
+    business:{cls:'pb-business',icon:'💼',label:'Plan Business',   desc:'Tout débloqué · 24 compétences · Business',up:false},
+  }[plan];
+  w.innerHTML=`<div class="plan-banner ${info.cls}">
+    <div class="pb-icon">${info.icon}</div>
+    <div><div class="pb-name">${info.label}</div><div class="pb-desc">${info.desc}</div></div>
+    <button class="pb-btn ${info.up?'pb-up':'pb-mg'}" onclick="${info.up?"openUpgradeModal()":"showToast('Gestion bientôt disponible !')"}">
+      ${info.up?'Upgrade':'Gérer'}
+    </button>
+  </div>`;
+}
+
+// ─── MESSAGES ───
+function addWelcome(){
+  const greets={
+    free:`Bonjour ! Je suis **AgentIA** 🤖\n\nPlan **Gratuit** activé — je peux déjà rédiger tes emails, résumer des textes, traduire et répondre à tes messages.\n\nPour débloquer le **Mode Business** (crypto, dropshipping, SaaS, ads...) passe au plan Business 🚀`,
+    pro:`Bonjour ! Je suis **AgentIA** ⚡\n\nPlan **Pro** activé — 12 compétences à ta disposition. Emails, réseaux sociaux, voyages, négociation...\n\nPour le **Mode Business** complet, upgrade ! 💼`,
+    elite:`Bonjour ! Je suis **AgentIA** 💎\n\nPlan **Élite** activé — je vais apprendre tes habitudes et m'améliorer avec toi. Coach bien-être inclus.\n\nIl te manque uniquement le **Mode Business** pour tout avoir ! 🚀`,
+    business:`Bonjour ! Je suis **AgentIA Business** 💼🚀\n\nTon agent IA complet est prêt. 24 compétences débloquées :\n\n**Quotidien** — Emails, résumés, voyages, négociation...\n**Business** — Crypto, dropshipping, SaaS, ads, B2B, legal, compta, growth hacking...\n\nQue veux-tu déléguer aujourd'hui ?`,
+  }[plan];
+  push('agent',greets);
+}
+
+function push(role,content,nudge=false){
+  const m={role,content,time:now(),nudge};
+  msgs.push(m);
+  localStorage.setItem('agentia_msgs',JSON.stringify(msgs.slice(-60)));
+}
+
+function renderMsgs(){
+  const c=document.getElementById('messages');
+  if(!c) return;
+  c.innerHTML='';
+  msgs.forEach(m=>c.appendChild(mkEl(m)));
+  scrollBot();
+}
+
+function addMsgDOM(m){
+  const c=document.getElementById('messages');
+  if(c){ c.appendChild(mkEl(m)); scrollBot(); }
+}
+
+function mkEl(m){
+  const isBiz=cat==='business'&&m.role==='agent';
+  const div=document.createElement('div');
+  div.className=`msg ${m.role}${isBiz?' biz-msg':''}`;
+  const av=document.createElement('div');
+  av.className='m-av';
+  av.textContent=m.role==='agent'?PLAN_META[plan].icon:'👤';
+  const right=document.createElement('div');
+  right.style.maxWidth='84%';
+  const bub=document.createElement('div');
+  bub.className='m-bub';
+  bub.innerHTML=fmt(m.content);
+  right.appendChild(bub);
+  if(m.nudge){
+    const card=document.createElement('div');
+    card.className='up-card';
+    card.onclick=openUpgradeModal;
+    card.innerHTML=`<div class="up-card-top"><div class="up-card-title">🔒 Compétence Business</div><button class="up-card-btn">Upgrader</button></div><div class="up-card-txt">Débloque le mode Business pour accéder à cette fonctionnalité et bien plus.</div>`;
+    right.appendChild(card);
+  }
+  const t=document.createElement('div');
+  t.className='m-time'; t.textContent=m.time||'';
+  right.appendChild(t);
+  div.appendChild(av); div.appendChild(right);
+  return div;
+}
+
+function fmt(t){
+  return (t||'')
+    .replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>')
+    .replace(/\*(.*?)\*/g,'<em>$1</em>')
+    .replace(/`(.*?)`/g,'<code>$1</code>')
+    .replace(/\n/g,'<br>');
+}
+
+function showDots(){
+  const c=document.getElementById('messages');
+  if(!c) return;
+  const div=document.createElement('div');
+  div.className='msg agent'; div.id='typing-dot';
+  div.innerHTML=`<div class="m-av">${PLAN_META[plan].icon}</div><div class="m-bub"><div class="typing"><span></span><span></span><span></span></div></div>`;
+  c.appendChild(div); scrollBot();
+}
+function hideDots(){ document.getElementById('typing-dot')?.remove(); }
+function scrollBot(){ const c=document.getElementById('messages'); if(c) c.scrollTop=c.scrollHeight; }
+
+// ─── SEND ───
+async function sendMsg(){
+  if(isTyping) return;
+  const inp=document.getElementById('msg-inp');
+  const text=inp.value.trim();
+  if(!text) return;
+  if(plan==='free'&&count>=20){ openUpgradeModal(); showToast('⚠️ 20 messages atteints. Upgrade !'); return; }
+  inp.value=''; autoResize(inp);
+  const um={role:'user',content:text,time:now()};
+  push('user',text); addMsgDOM(um);
+  count++; localStorage.setItem('agentia_count',count);
+  isTyping=true; document.getElementById('send-btn').disabled=true;
+  showDots();
+
+  const history=msgs.slice(-16).map(m=>({role:m.role==='agent'?'assistant':'user',content:m.content}));
+
+  try{
+    const res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:SYSTEM,messages:history})
+    });
+    const data=await res.json();
+    hideDots();
+    if(data.error){ const m={role:'agent',content:`❌ Erreur : ${data.error.message}`,time:now()}; push('agent',m.content); addMsgDOM(m); }
+    else{ const reply=data.content?.[0]?.text||'Désolé, je n\'ai pas pu répondre.'; const m={role:'agent',content:reply,time:now()}; push('agent',reply); addMsgDOM(m); }
+  }catch(e){
+    hideDots();
+    const m={role:'agent',content:'❌ Connexion impossible. Vérifie ta clé API.',time:now()}; push('agent',m.content); addMsgDOM(m);
+  }
+  isTyping=false; document.getElementById('send-btn').disabled=false;
+}
+
+function handleKey(e){ if(e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); sendMsg(); } }
+function autoResize(el){ el.style.height='auto'; el.style.height=Math.min(el.scrollHeight,130)+'px'; }
+
+// ─── MODAL ───
+function openUpgradeModal(){ selModalPlanVal='business'; document.getElementById('upgrade-modal').classList.remove('hidden'); }
+function closeModal(id){ document.getElementById(id).classList.add('hidden'); }
+function closeModalOut(e,id){ if(e.target===document.getElementById(id)) closeModal(id); }
+
+function selModalPlan(p){
+  selModalPlanVal=p;
+  ['pro','elite','business'].forEach(x=>{ const el=document.getElementById('m-'+x); if(el) el.classList.remove('sel'); });
+  document.getElementById('m-'+p)?.classList.add('sel');
+}
+
+function doUpgrade(){
+  plan=selModalPlanVal;
+  localStorage.setItem('agentia_plan',plan);
+  count=0; localStorage.setItem('agentia_count','0');
+  closeModal('upgrade-modal');
+  renderHeader(); renderCats(); renderSkillsGrid(); renderSkillsStg(); renderPlanBanner();
+  msgs=[]; localStorage.removeItem('agentia_msgs');
+  addWelcome(); renderMsgs();
+  const t={pro:'⚡ Plan Pro activé !',elite:'👑 Plan Élite activé !',business:'🚀 Mode Business activé — 24 compétences débloquées !'};
+  showToast(t[plan]);
+}
+
+// ─── UTILS ───
+function updateKeyPreview(){ const el=document.getElementById('key-preview'); if(el&&apiKey) el.textContent=apiKey.slice(0,12)+'****'; }
+function now(){ return new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}); }
+function showToast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),3200); }
+function clearAll(){ if(confirm('Réinitialiser toute l\'application ?')){ localStorage.clear(); location.reload(); } }
+</script>
+</body>
+</html>
