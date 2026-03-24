@@ -1341,19 +1341,20 @@ async function sendMsg() {
   });
 
   try {
-    const res = await fetch('https://api.anthropic.com/v1/messages', {
+    // Proxy sécurisé — clé Anthropic côté serveur uniquement
+    const uid = window._fbUser?.uid || 'anonymous';
+    const res = await fetch('/api/chat', {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': apiKey,
-        'anthropic-version': '2023-06-01',
-        'anthropic-dangerous-direct-browser-access': 'true'
+        'Content-Type': 'application/json'
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 1500,
         system: sysPrompt,
-        messages: apiMsgs
+        messages: apiMsgs,
+        uid: uid,
+        plan: plan
       })
     });
 
