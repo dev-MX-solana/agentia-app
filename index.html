@@ -8,15 +8,17 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="AgentIA">
 <title>AgentIA</title>
+<link rel="icon" type="image/jpeg" href="brain.jpg">
+<link rel="apple-touch-icon" href="brain.jpg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root {
-  --bg:       #0a0a12;
-  --sidebar:  #0f0f1a;
-  --surface:  #161622;
-  --surface2: #1e1e2e;
-  --surface3: #26263a;
+  --bg:       #0a0a0a;
+  --sidebar:  #111111;
+  --surface:  #1a1a1a;
+  --surface2: #222222;
+  --surface3: #2a2a2a;
   --v:        #7c5cfc;
   --v2:       #9b7fff;
   --v3:       #c4b0ff;
@@ -26,13 +28,118 @@
   --biz2:     #3dffc4;
   --red:      #ff6b6b;
   --green:    #4ade80;
-  --text:     #f0eeff;
-  --text2:    #8b87b0;
-  --text3:    #4a4668;
-  --border:   rgba(124,92,252,.14);
-  --border2:  rgba(255,255,255,.06);
-  --r:        16px;
-  --rsm:      10px;
+  --text:     #ececec;
+  --text2:    #888888;
+  --text3:    #444444;
+  --border:   rgba(255,255,255,.08);
+  --border2:  rgba(255,255,255,.05);
+  --chrome:   rgba(180,180,200,.12);
+  --r:        12px;
+  --rsm:      8px;
+}
+
+/* ══ SPLASH SCREEN ══ */
+#splash {
+  position: fixed; inset: 0; z-index: 9999;
+  background: #0a0a0a;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 20px;
+  transition: opacity .5s ease, visibility .5s ease;
+}
+#splash.hidden { opacity: 0; visibility: hidden; }
+
+.splash-brain-wrap {
+  width: 140px; height: 140px;
+  position: relative;
+  perspective: 600px;
+}
+.splash-brain {
+  width: 100%; height: 100%;
+  border-radius: 50%;
+  object-fit: cover;
+  animation: brain3d 4s ease-in-out infinite;
+  filter: drop-shadow(0 0 30px rgba(124,92,252,.6)) drop-shadow(0 0 60px rgba(124,92,252,.3));
+}
+@keyframes brain3d {
+  0%   { transform: rotateY(0deg) scale(1); }
+  25%  { transform: rotateY(90deg) scale(0.85); }
+  50%  { transform: rotateY(180deg) scale(1); }
+  75%  { transform: rotateY(270deg) scale(0.85); }
+  100% { transform: rotateY(360deg) scale(1); }
+}
+
+/* Circuit rings around brain */
+.splash-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 1px solid rgba(124,92,252,.3);
+  animation: ringPulse 2s ease-in-out infinite;
+  top: 50%; left: 50%; transform: translate(-50%,-50%);
+}
+.splash-ring:nth-child(2) { width: 160px; height: 160px; animation-delay: 0s; }
+.splash-ring:nth-child(3) { width: 190px; height: 190px; animation-delay: .4s; border-color: rgba(124,92,252,.15); }
+.splash-ring:nth-child(4) { width: 220px; height: 220px; animation-delay: .8s; border-color: rgba(124,92,252,.08); }
+@keyframes ringPulse {
+  0%,100% { opacity: .5; transform: translate(-50%,-50%) scale(1); }
+  50% { opacity: 1; transform: translate(-50%,-50%) scale(1.04); }
+}
+
+.splash-name {
+  font-family: 'Instrument Serif', serif;
+  font-size: 32px; color: #fff; letter-spacing: -1px;
+  background: linear-gradient(135deg, #fff 0%, var(--v3) 100%);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+}
+.splash-dots {
+  display: flex; gap: 6px;
+}
+.splash-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--v);
+  animation: dotBounce 1.2s ease-in-out infinite;
+}
+.splash-dot:nth-child(2) { animation-delay: .2s; }
+.splash-dot:nth-child(3) { animation-delay: .4s; }
+@keyframes dotBounce {
+  0%,100% { transform: translateY(0); opacity: .4; }
+  50% { transform: translateY(-8px); opacity: 1; }
+}
+
+/* ══ CHROME CIRCUIT DECORATIONS ══ */
+.circuit-bg {
+  position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden;
+}
+.circuit-line {
+  position: absolute;
+  background: linear-gradient(90deg, transparent, rgba(124,92,252,.15), transparent);
+  height: 1px;
+  animation: circuitFlow 6s linear infinite;
+}
+.circuit-line:nth-child(1) { top: 15%; width: 200px; left: -200px; animation-delay: 0s; }
+.circuit-line:nth-child(2) { top: 40%; width: 150px; left: -150px; animation-delay: 2s; }
+.circuit-line:nth-child(3) { top: 65%; width: 250px; left: -250px; animation-delay: 4s; }
+.circuit-line:nth-child(4) { top: 80%; width: 180px; left: -180px; animation-delay: 1s; }
+@keyframes circuitFlow {
+  from { transform: translateX(0); opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  to { transform: translateX(110vw); opacity: 0; }
+}
+
+.circuit-node {
+  position: absolute;
+  width: 4px; height: 4px; border-radius: 50%;
+  background: var(--v);
+  box-shadow: 0 0 8px var(--v);
+  animation: nodeBlink 3s ease-in-out infinite;
+}
+.circuit-node:nth-child(5) { top: 20%; right: 80px; animation-delay: 0s; }
+.circuit-node:nth-child(6) { top: 50%; right: 40px; animation-delay: 1s; }
+.circuit-node:nth-child(7) { bottom: 30%; right: 120px; animation-delay: 2s; }
+@keyframes nodeBlink {
+  0%,100% { opacity: .2; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.5); }
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
@@ -729,9 +836,36 @@ html, body { height: 100%; width: 100%; background: var(--bg); color: var(--text
 </head>
 <body>
 
+<!-- ══ SPLASH SCREEN ══ -->
+<div id="splash">
+  <div class="splash-brain-wrap">
+    <img src="brain.jpg" class="splash-brain" alt="AgentIA">
+    <div class="splash-ring"></div>
+    <div class="splash-ring"></div>
+    <div class="splash-ring"></div>
+  </div>
+  <div class="splash-name">AgentIA</div>
+  <div class="splash-dots">
+    <div class="splash-dot"></div>
+    <div class="splash-dot"></div>
+    <div class="splash-dot"></div>
+  </div>
+</div>
+
+<!-- ══ CIRCUIT BACKGROUND ══ -->
+<div class="circuit-bg">
+  <div class="circuit-line"></div>
+  <div class="circuit-line"></div>
+  <div class="circuit-line"></div>
+  <div class="circuit-line"></div>
+  <div class="circuit-node"></div>
+  <div class="circuit-node"></div>
+  <div class="circuit-node"></div>
+</div>
+
 <!-- ══ ONBOARDING ══ -->
 <div class="full-screen" id="s-onboard">
-  <div class="ob-logo-ring"><div class="ob-logo-inner">🤖</div></div>
+  <div class="ob-logo-ring"><div class="ob-logo-inner" style="background:none;padding:0;overflow:hidden"><img src="brain.jpg" style="width:100%;height:100%;object-fit:cover;border-radius:50%;animation:brain3d 6s ease-in-out infinite"></div></div>
   <div class="ob-title">AgentIA</div>
   <div class="ob-sub">L'agent IA des entrepreneurs et du quotidien. Vraiment intelligent, vraiment utile.</div>
 
@@ -753,7 +887,7 @@ html, body { height: 100%; width: 100%; background: var(--bg); color: var(--text
 <div class="full-screen hidden" id="s-auth">
   <div class="auth-card">
     <div class="auth-logo">
-      <div class="auth-logo-icon">🤖</div>
+      <div class="auth-logo-icon" style="background:none;padding:0;overflow:hidden"><img src="brain.jpg" style="width:36px;height:36px;border-radius:10px;object-fit:cover"></div>
       <div class="auth-logo-name">AgentIA</div>
     </div>
     <div id="auth-err" class="auth-err"></div>
@@ -882,7 +1016,7 @@ html, body { height: 100%; width: 100%; background: var(--bg); color: var(--text
   <div class="sidebar" id="sidebar">
     <div class="sidebar-header">
       <div class="brand">
-        <div class="brand-logo">🤖</div>
+        <div class="brand-logo" style="background:none;padding:0;overflow:hidden"><img src="brain.jpg" style="width:30px;height:30px;border-radius:8px;object-fit:cover;filter:drop-shadow(0 0 6px rgba(124,92,252,.5))"></div>
         <div class="brand-name">AgentIA</div>
       </div>
       <button class="new-chat-btn" onclick="newChat()" title="Nouvelle conversation">✏</button>
@@ -936,7 +1070,9 @@ html, body { height: 100%; width: 100%; background: var(--bg); color: var(--text
     <!-- Chat -->
     <div class="chat-area" id="chat-area">
       <div class="empty-state" id="empty-state">
-        <div class="es-logo">🤖</div>
+        <div class="es-logo" style="background:none;padding:0;overflow:hidden;box-shadow:0 0 40px rgba(124,92,252,.4)">
+          <img src="brain.jpg" style="width:56px;height:56px;border-radius:16px;object-fit:cover;animation:brain3d 6s ease-in-out infinite;filter:drop-shadow(0 0 10px rgba(124,92,252,.6))">
+        </div>
         <div class="es-title">Bonjour, je suis AgentIA</div>
         <div class="es-sub">Ton agent IA personnel. Je me souviens de toi, je cherche sur le web, je lis tes documents. Dis-moi ce que tu veux faire.</div>
         <div class="suggestions" id="suggestions"></div>
@@ -1114,6 +1250,12 @@ let attachedFileData = null;
 //  BOOT
 // ══════════════════════════════════════
 window.addEventListener('load', () => {
+  // Splash screen — 2.5s puis disparaît
+  setTimeout(() => {
+    const splash = document.getElementById('splash');
+    if (splash) splash.classList.add('hidden');
+  }, 2500);
+
   if (apiKey) { initApp(); showApp(); }
   else goFullScreen('s-onboard');
 });
