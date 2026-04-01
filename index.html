@@ -655,7 +655,19 @@ html, body { height: 100%; width: 100%; background: var(--black); color: var(--w
 <div class="toast" id="toast"></div>
 
 <script>
+// ── Firebase Configuration ──────────────────────────────────────────────────
+window.FIREBASE_CONFIG = {
+  apiKey: "AIzaSyCTrcCmqzYUu2D6VbDq3mOl5sZtx9EqQ0I",
+  authDomain: "agentia-app.firebaseapp.com",
+  projectId: "agentia-app",
+  storageBucket: "agentia-app.firebasestorage.app",
+  messagingSenderId: "243563217643",
+  appId: "1:243563217643:web:8308a8fad8dab971b834ae",
+  measurementId: "G-KNK7B39L7N"
+};
+
 const LOGO_URL = null;
+
 const CAPS = ['Chat intelligent','Mémoire longue','Web search','Analyse PDF','Génération de code','Multi-langues','Mode vocal','Sécurisé E2E','Analyse d\'images','Traduction','Résumés','Questions complexes','Chat intelligent','Mémoire longue','Web search','Analyse PDF','Génération de code','Multi-langues','Mode vocal','Sécurisé E2E'];
 const PLANS_META = {
   free:      { name:'Gratuit',   sub:'30 msg/jour',                           dot:'#555',     badge:'Gratuit',   bcls:'tbb-free'   },
@@ -1523,18 +1535,125 @@ function saveIntegrations() {
   goTo('s-plans');
 }
 
-// ── Firebase Auth module (stub — replace with real config) ────────────────────
-(function() {
-  // To enable real Firebase auth, replace this block with:
-  // import { initializeApp } from "firebase/app";
-  // import { getAuth, ... } from "firebase/auth";
-  // For now, these are no-ops that fall through to the local path.
-  // window._fbEmailSignUp = async (email, pw, name) => { ... };
-  // window._fbEmailSignIn = async (email, pw) => { ... };
-  // window._fbGoogleSignIn = async () => { ... };
-  // window._fbAppleSignIn  = async () => { ... };
-  // window._fbResetPw      = async (email) => { ... };
-  // window._fbSignOut      = async () => { ... };
+// ── Firebase Auth + Firestore (dynamique — charge si window.FIREBASE_CONFIG est défini) ──
+(async function initFirebase() {
+  const cfg = window.FIREBASE_CONFIG;
+  if (!cfg || !cfg.apiKey || cfg.apiKey.startsWith('REMPLACE')) {
+    console.log('AgentIA: Firebase non configuré → mode clé API locale');
+    return;
+  }
+
+  try {
+    // Imports dynamiques via esm.sh (CDN, pas besoin de bundler)
+    const { initializeApp }             = await import('https://esm.sh/firebase/app');
+    const { getFirestore, doc, setDoc, getDoc, serverTimestamp } = await import('https://esm.sh/firebase/firestore');
+    const {
+      getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword,
+      GoogleAuthProvider, signInWithPopup, sendPasswordResetEmail,
+      signOut, onAuthStateChanged, updateProfile
+    } = await import('https://esm.sh/firebase/auth');
+
+    const app  = initializeApp(cfg);
+    const auth = getAuth(app);
+    const db   = getFirestore(app);
+
+    // ── Helpers Firestore ───────────────────────────────────────────────────
+    async function saveUserToFirestore(user, extraData = {}) {
+      try {
+        const ref = doc(db, 'users', user.uid);
+        await setDoc(ref, {
+          uid:         user.uid,
+          email:       user.email || '',
+          displayName: user.displayName || extraData.name || '',
+          photoURL:    user.photoURL || '',
+          plan:        extraData.plan || plan || 'free',
+          updatedAt:   serverTimestamp()
+        }, { merge: true });
+      } catch (e) {
+        console.warn('Firestore saveUser error:', e);
+      }
+    }
+
+    async function loadUserFromFirestore(user) {
+      try {
+        const ref  = doc(db, 'users', user.uid);
+        const snap = await getDoc(ref);
+        if (snap.exists()) {
+          const data = snap.data();
+          // Restaure le plan
+          if (data.plan && data.plan !== 'free') {
+            plan = data.plan;
+            localStorage.setItem('ag6_plan', plan);
+          }
+          // Restaure le prénom en mémoire si absent
+          const name = data.displayName || '';
+          if (name && !memory.some(m => m.startsWith('Prénom'))) {
+            const prenom = name.split(' ')[0];
+            memory.push('Prénom : ' + prenom);
+            localStorage.setItem('ag6_mem', JSON.stringify(memory));
+          }
+        }
+      } catch (e) {
+        console.warn('Firestore loadUser error:', e);
+      }
+    }
+
+    // ── Auth state listener ─────────────────────────────────────────────────
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        await loadUserFromFirestore(user);
+        updateUserBar(user);
+        if (apiKey || true) { // toujours aller à l'app si connecté Firebase
+          initApp(); showApp();
+        }
+      } else {
+        updateUserBar(null);
+      }
+    });
+
+    // ── Expose les fonctions auth ───────────────────────────────────────────
+    window._fbEmailSignUp = async (email, pw, name) => {
+      const cred = await createUserWithEmailAndPassword(auth, email, pw);
+      if (name) await updateProfile(cred.user, { displayName: name });
+      await saveUserToFirestore(cred.user, { name });
+    };
+
+    window._fbEmailSignIn = async (email, pw) => {
+      const cred = await signInWithEmailAndPassword(auth, email, pw);
+      await loadUserFromFirestore(cred.user);
+      updateUserBar(cred.user);
+      initApp(); showApp();
+    };
+
+    window._fbGoogleSignIn = async () => {
+      const provider = new GoogleAuthProvider();
+      const cred = await signInWithPopup(auth, provider);
+      await saveUserToFirestore(cred.user);
+      await loadUserFromFirestore(cred.user);
+      updateUserBar(cred.user);
+      initApp(); showApp();
+    };
+
+    window._fbAppleSignIn = async () => {
+      // Apple Sign-In via Firebase requiert configuration dans Firebase Console
+      // + domaine autorisé. Fonctionne comme Google une fois configuré.
+      showToast('Apple Sign-In : active-le dans Firebase Console');
+    };
+
+    window._fbResetPw = async (email) => {
+      await sendPasswordResetEmail(auth, email);
+    };
+
+    window._fbSignOut = async () => {
+      await signOut(auth);
+    };
+
+    console.log('AgentIA: Firebase Auth + Firestore initialisés ✓');
+
+  } catch (e) {
+    console.error('AgentIA: Erreur init Firebase —', e.message);
+    showToast('Erreur Firebase : ' + e.message);
+  }
 })();
 </script>
 </body>
